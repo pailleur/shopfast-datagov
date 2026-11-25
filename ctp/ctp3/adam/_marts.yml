@@ -41,15 +41,15 @@ models:
         description: "Unique primary key of the customer account."
         data_tests: [unique, not_null]
       - name: first_name
-        description: "Customer first name formatted in title case."
+        description: "[PII - confidential] Customer first name formatted in title case."
         tags: ['pii']
         meta: {classification: confidential}
       - name: last_name
-        description: "Customer last name formatted in title case."
+        description: "[PII - confidential] Customer last name formatted in title case."
         tags: ['pii']
         meta: {classification: confidential}
       - name: email
-        description: "Customer normalized login email address."
+        description: "[PII - confidential] Customer normalized login email address."
         tags: ['pii']
         meta: {classification: confidential}
       - name: country_code

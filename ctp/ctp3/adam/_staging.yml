@@ -1,4 +1,4 @@
-version: 2
+﻿version: 2
 
 # CTP 3 - Exercise 1: document and govern the staging models.
 # For each model: description, meta (owner, steward, domain, tier); for each column: description,
@@ -17,27 +17,27 @@ models:
         description: "Technical identifier of the customer account. One person may have several accounts (see duplicates)."
         data_tests: [unique, not_null]
       - name: first_name
-        description: "Customer first name formatted in title case."
+        description: "[PII - confidential] Customer first name formatted in title case."
         tags: ['pii']
         meta: {classification: confidential}
       - name: last_name
-        description: "Customer last name formatted in title case."
+        description: "[PII - confidential] Customer last name formatted in title case."
         tags: ['pii']
         meta: {classification: confidential}
       - name: email
-        description: "Login email, trimmed and lower-cased."
+        description: "[PII - confidential] Login email, trimmed and lower-cased."
         tags: ['pii']
         meta: {classification: confidential}
       - name: phone
-        description: "Customer phone number as collected during registration."
+        description: "[PII - confidential] Customer phone number as collected during registration."
         tags: ['pii']
         meta: {classification: confidential}
       - name: birth_date
-        description: "Customer date of birth parsed into ISO format (YYYY-MM-DD)."
+        description: "[PII - restricted] Customer date of birth parsed into ISO format (YYYY-MM-DD)."
         tags: ['pii']
         meta: {classification: restricted}
       - name: city
-        description: "City of the customer's primary postal address."
+        description: "[PII - confidential] City of the customer's primary postal address."
         tags: ['pii']
         meta: {classification: confidential}
       - name: country_code
@@ -130,14 +130,14 @@ models:
           - accepted_values:
               values: ['card', 'paypal', 'apple_pay', 'bank_transfer']
       - name: amount
-        description: "Payment transaction amount expressed in EUROS with 2 decimal places (e.g., 184.31) — NEVER in integer cents."
+        description: "Payment transaction amount expressed in EUROS with 2 decimal places (e.g., 184.31) â€” NEVER in integer cents."
       - name: currency
         description: "ISO-4217 three-letter currency code of the transaction (EUR)."
         data_tests:
           - accepted_values:
               values: ['EUR']
       - name: card_last4
-        description: "Last 4 digits of the payment card used (masked reference, non-PII)."
+        description: "Last 4 digits of the payment card used (masked reference, not personal data)."
       - name: payment_status
         description: "Processing outcome of the payment event (captured, refunded, failed)."
         data_tests:
