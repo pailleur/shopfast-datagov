@@ -1,0 +1,169 @@
+version: 2
+
+# CTP 3 - Exercise 1: document and govern the staging models.
+# For each model: description, meta (owner, steward, domain, tier); for each column: description,
+# and for personal data: tags: ['pii'] + meta: {classification: confidential|restricted}.
+
+models:
+  - name: stg_customers
+    description: "One row per customer account, cleaned from raw.customers (exact duplicate rows removed, ISO country codes, ISO dates)."
+    meta:
+      owner: "Sara Martin (Head of Sales)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: customer
+      tier: gold
+    columns:
+      - name: customer_id
+        description: "Technical identifier of the customer account. One person may have several accounts (see duplicates)."
+        data_tests: [unique, not_null]
+      - name: first_name
+        description: "Customer first name formatted in title case."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: last_name
+        description: "Customer last name formatted in title case."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: email
+        description: "Login email, trimmed and lower-cased."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: phone
+        description: "Customer phone number as collected during registration."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: birth_date
+        description: "Customer date of birth parsed into ISO format (YYYY-MM-DD)."
+        tags: ['pii']
+        meta: {classification: restricted}
+      - name: city
+        description: "City of the customer's primary postal address."
+        tags: ['pii']
+        meta: {classification: confidential}
+      - name: country_code
+        description: "Standardized ISO 3166-1 alpha-2 country code (FR, DE, ES, BE)."
+        data_tests:
+          - accepted_values:
+              values: ['FR', 'DE', 'ES', 'BE']
+      - name: signup_date
+        description: "Date when the customer account was created (YYYY-MM-DD)."
+      - name: has_marketing_consent
+        description: "Boolean flag indicating whether the customer explicitly opted in to marketing communications."
+      - name: loyalty_tier
+        description: "Normalized customer loyalty program level (bronze, silver, gold, platinum)."
+        data_tests:
+          - accepted_values:
+              values: ['bronze', 'silver', 'gold', 'platinum']
+
+  - name: stg_orders
+    description: "One row per customer order, deduplicated on order_id with standardized lifecycle status and amounts in EUR."
+    meta:
+      owner: "Sara Martin (Head of Sales)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: sales
+      tier: gold
+    columns:
+      - name: order_id
+        description: "Unique technical identifier of the order."
+        data_tests: [unique, not_null]
+      - name: customer_id
+        description: "Foreign key referencing the customer account in stg_customers."
+        data_tests: [not_null]
+      - name: order_date
+        description: "Date on which the order was placed (YYYY-MM-DD)."
+      - name: status
+        description: "Standardized order lifecycle status (pending, shipped, delivered, cancelled, returned)."
+        data_tests:
+          - accepted_values:
+              values: ['pending', 'shipped', 'delivered', 'cancelled', 'returned']
+      - name: channel
+        description: "Sales channel where the order was placed (web, mobile_app, marketplace)."
+        data_tests:
+          - accepted_values:
+              values: ['web', 'mobile_app', 'marketplace']
+      - name: shipping_country
+        description: "ISO-2 destination country code for delivery (FR, DE, ES, BE)."
+        data_tests:
+          - accepted_values:
+              values: ['FR', 'DE', 'ES', 'BE']
+      - name: total_amount_eur
+        description: "Gross order amount in EUROS with 2 decimal places (VAT and shipping included, before refunds)."
+
+  - name: stg_order_items
+    description: "One row per product line of an order."
+    meta:
+      owner: "Sara Martin (Head of Sales)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: sales
+      tier: silver
+    columns:
+      - name: order_item_id
+        description: "Unique technical identifier of the order line item."
+        data_tests: [unique, not_null]
+      - name: order_id
+        description: "Foreign key referencing the parent order in stg_orders."
+      - name: product_id
+        description: "Foreign key referencing the purchased product in stg_products."
+      - name: quantity
+        description: "Number of product units ordered on this line."
+      - name: unit_price_eur
+        description: "Unit selling price in EUROS with 2 decimal places (VAT included)."
+
+  - name: stg_payments
+    description: "One row per payment event from the payment provider (captured or refunded)."
+    meta:
+      owner: "Paul Girard (Head of Finance)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: finance
+      tier: gold
+    columns:
+      - name: payment_id
+        description: "Unique transaction identifier assigned by the payment provider."
+        data_tests: [unique, not_null]
+      - name: order_id
+        description: "Foreign key referencing the paid order in stg_orders."
+      - name: payment_date
+        description: "Date when the payment event was processed (YYYY-MM-DD)."
+      - name: method
+        description: "Payment method used by the customer (card, paypal, apple_pay, bank_transfer)."
+        data_tests:
+          - accepted_values:
+              values: ['card', 'paypal', 'apple_pay', 'bank_transfer']
+      - name: amount
+        description: "Payment transaction amount expressed in EUROS with 2 decimal places (e.g., 184.31) — NEVER in integer cents."
+      - name: currency
+        description: "ISO-4217 three-letter currency code of the transaction (EUR)."
+        data_tests:
+          - accepted_values:
+              values: ['EUR']
+      - name: card_last4
+        description: "Last 4 digits of the payment card used (masked reference, non-PII)."
+      - name: payment_status
+        description: "Processing outcome of the payment event (captured, refunded, failed)."
+        data_tests:
+          - accepted_values:
+              values: ['captured', 'refunded', 'failed']
+
+  - name: stg_products
+    description: "Product catalogue with list prices."
+    meta:
+      owner: "Marc Lefevre (Head of Product)"
+      steward: "Karim Benali (Analytics Engineer)"
+      domain: product
+      tier: silver
+    columns:
+      - name: product_id
+        description: "Unique technical identifier of the product in the catalog."
+        data_tests: [unique, not_null]
+      - name: sku
+        description: "Commercial Stock Keeping Unit (SKU) reference code."
+      - name: product_name
+        description: "Commercial display name of the product."
+      - name: category
+        description: "Product category formatted in title case."
+      - name: list_price_eur
+        description: "Standard catalog list price in EUROS with 2 decimal places (VAT included)."
+      - name: supplier
+        description: "Name of the product supplier."
+      - name: is_active
+        description: "Boolean flag indicating whether the product is currently active and available for sale."
