@@ -1,0 +1,12 @@
+dimension;rule;failing_rows;total_rows;score_pct;severity;who_fixes
+Completeness;email is not null;48;1241;96.13;medium;Owner
+Completeness;country is not null;37;1241;97.02;high;Owner
+Completeness;phone is not null;30;1241;97.58;low;Owner
+Uniqueness;customer_id is unique;16;1241;98.71;high;Custodian
+Uniqueness;normalised email is unique;120;1241;90.33;high;Owner
+Validity;email matches valid regex;19;1241;98.47;medium;Owner
+Validity;loyalty_tier in allowed set;13;1241;98.95;medium;Steward
+Validity;French postal_code has 5 digits;48;1241;96.13;medium;Custodian
+Consistency;country is ISO-2 (FR, DE, ES, BE);299;1241;75.91;medium;Steward
+Consistency;signup_date format is YYYY-MM-DD;303;1241;75.58;medium;Custodian
+Accuracy;birth_date between 1906 and today;8;1241;99.36;high;Owner

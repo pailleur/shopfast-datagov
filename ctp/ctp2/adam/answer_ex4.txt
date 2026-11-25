@@ -1,0 +1,1 @@
+﻿ShopFast was missing a Data Contract (defining the schema and unit agreement that amount must be sent in decimal euros rather than integer cents between the payment producer and the data team), enforced by automated range and distribution tests in the ingestion pipeline.
